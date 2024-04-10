@@ -1,23 +1,22 @@
-interface LocalStorageItem {
-  key: string;
-  value: string;
+export function removeStorageItem(key: string): void {
+  window.localStorage.removeItem(key);
 }
 
-export class LocalStorageService {
-  static getItem(key: string): string | null {
-    const item = localStorage.getItem(key);
-    return item !== null ? item : null;
+export function clearStorage(): void {
+  window.localStorage.clear();
+}
+
+export function getStorageItem<T>(key: string): T | null {
+  const item = window.localStorage.getItem(key);
+
+  if (item !== null) {
+    return JSON.parse(item) as T;
   }
 
-  static setItem(item: LocalStorageItem): void {
-    localStorage.setItem(item.key, item.value);
-  }
+  return null;
+}
 
-  static removeItem(key: string): void {
-    localStorage.removeItem(key);
-  }
-
-  static clear(): void {
-    localStorage.clear();
-  }
+export function setStorageItem<T>(key: string, value: T): void {
+  const item = JSON.stringify(value);
+  window.localStorage.setItem(key, item);
 }

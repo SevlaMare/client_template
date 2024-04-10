@@ -1,5 +1,9 @@
+'use client';
+
 import { createContext, useEffect, useState } from 'react';
-import { useLocalStorage } from '@/hooks/useLocalStore';
+import { getStorageItem, setStorageItem } from '@/services/storage';
+
+const THEME_STORE_KEY = 'THME101';
 
 export const ThemeContext = createContext<ThemeContextType | undefined>(
   undefined
@@ -16,23 +20,41 @@ export function ThemeProvider(props: {
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
-    // 1 manual choice stored
+    const themePreference = getStorageItem(THEME_STORE_KEY);
+    console.log('what we get', themePreference);
 
-    // 2 no manual choice + system has defined:
-    if (window.matchMedia('prefers-colors-schema: dark').matches) {
+    if (themePreference == 'dark') {
       setDarkMode(true);
+      document.documentElement.classList.toggle('dark');
     }
-    // document.documentElement.classList.toggle('dark');
+
+    if (typeof window !== 'undefined') {
+      // never defined
+      if (!themePreference || themePreference == 'dark') {
+        // system has preference
+        if (window.matchMedia('prefers-colors-schema: dark').matches) {
+          setDarkMode(true);
+          document.documentElement.classList.toggle('dark');
+          setStorageItem(THEME_STORE_KEY, 'dark');
+        }
+      } else {
+        if (themePreference !== 'dark') {
+          setDarkMode(false);
+          setStorageItem(THEME_STORE_KEY, 'light');
+        }
+      }
+    }
   }, []);
 
   function toggleDarkMode() {
     if (darkMode) {
       setDarkMode(false);
       document.documentElement.classList.remove('dark');
-      // useStore()
+      setStorageItem(THEME_STORE_KEY, 'dark');
     } else if (!darkMode) {
       setDarkMode(true);
       document.documentElement.classList.add('dark');
+      setStorageItem(THEME_STORE_KEY, 'dark');
     }
   }
 

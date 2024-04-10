@@ -1,5 +1,4 @@
 import { createContext, useState, ReactNode, useEffect } from 'react';
-// import {useLocalStorage} from '@/hooks/useLocalStore'
 
 interface User {
   username: string;
@@ -18,7 +17,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 );
 
 // api calls will need this for private endpoints
-const TOKEN_KEY = 'USERTOKEN';
+const TOKEN_KEY = 'USRTOKEN';
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);

@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useTheme } from '@/providers/theme/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 
 const menuRoutes = [
   { path: '/', title: 'Home' },

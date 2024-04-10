@@ -1,43 +1,33 @@
 import { useState, useEffect } from 'react';
-import { storage } from '@/services/storage';
+import { getStorageItem, setStorageItem } from '@/services/storage';
+import { Logger } from '@/services/logger';
 
-export const useLocalStorage = <T>(
-  keyName: string,
-  defaultValue: T
-): [T, (newValue: T) => void] => {
+// TODO: sync with server
+export function useLocalStorage<T>(
+  key: string,
+  initialValue: T
+): [T, (value: T) => void] {
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
-      const value = window.localStorage.getItem(keyName);
-      if (value !== null) {
-        return JSON.parse(value);
-      } else {
-        window.localStorage.setItem(keyName, JSON.stringify(defaultValue));
-        return defaultValue;
-      }
-    } catch (err) {
-      return defaultValue;
+      const item = getStorageItem<T>(key);
+      return item !== null ? item : initialValue;
+    } catch (error: unknown) {
+      Logger('Error retrieving data from localStorage.');
+      return initialValue;
     }
   });
 
   useEffect(() => {
     try {
-      const value = window.localStorage.getItem(keyName);
-      if (value !== null) {
-        setStoredValue(JSON.parse(value));
-      }
-    } catch (err) {
-      throw new Error(`Error accessing storage: ${err}`);
+      setStorageItem(key, storedValue);
+    } catch (error) {
+      Logger('Error setting data to localStorage.');
     }
-  }, [keyName]);
+  }, [key, storedValue]);
 
-  const setValue = (newValue: T) => {
-    try {
-      window.localStorage.setItem(keyName, JSON.stringify(newValue));
-      setStoredValue(newValue);
-    } catch (err) {
-      console.error('Error setting localStorage:', err);
-    }
+  const setValue = (value: T) => {
+    setStoredValue(value);
   };
 
   return [storedValue, setValue];
-};
+}
